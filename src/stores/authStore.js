@@ -5,20 +5,22 @@ import { useRouter, useRoute } from "vue-router";
 
 export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
-  const user = ref({});
+  const user = ref(null);
 
+  onMounted(async () => {
+    await getUser();
+  });
 
   const getUser = async () => {
     try {
-        const { data } = await apiAuth.authUser();
-        user.value =  data;
-        
-      } catch (error) {
-        user.value = null;
-        console.log("Error de user", error);
-      }
-  }
-  
+      const { data } = await apiAuth.authUser();
+      user.value = data;
+    } catch (error) {
+      user.value = null;
+      console.log("Error de user", error);
+    }
+  };
+
   const login = async (datos, errores) => {
     try {
       await apiAuth.csrf();
@@ -32,25 +34,33 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const registro = async (datos, errores) => {
+    try {
+      const response = await apiAuth.register(datos);
+      console.log(response);
+      await getUser();
+      await router.push({ name: "home" });
+    } catch (error) {
+      console.log("Error en el registro", error);
+    }
+  };
+
   const logout = async () => {
     try {
       await apiAuth.logout();
-      console.log("has cerrado sesión");
-      router.push({ name: "login" });
+      user.value = null;
+      await router.push({ name: "login" });
     } catch (error) {}
   };
 
-
-  onMounted(() => {
-    getUser();
-  })
   const isAuthenticated = computed(() => !!user.value);
 
   return {
     login,
+    registro,
     logout,
     user,
     getUser,
-    isAuthenticated
+    isAuthenticated,
   };
 });

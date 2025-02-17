@@ -3,6 +3,7 @@ import { RouterLink } from "vue-router";
 import { reactive, ref } from "vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "vue-router";
+import Alerta from "@/components/Alerta.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -13,14 +14,8 @@ const datos = reactive({
 });
 
 const handleLogin = async () => {
-  await authStore.login(datos, errores)
+  await authStore.login(datos, errores);
 };
-
-// function getCookie(name) {
-//   const value = `; ${document.cookie}`;
-//   const parts = value.split(`; ${name}=`);
-//   if (parts.length === 2) return parts.pop().split(";").shift();
-// }
 </script>
 <template>
   <div class="container w-7/8 md:w-1/2 mx-auto shadow-lg p-4 bg-white">
@@ -28,6 +23,11 @@ const handleLogin = async () => {
       Inicia sesión
     </h1>
     <form @submit.prevent="handleLogin" class="p-4">
+      <div v-if="errores" class="my-4">
+        <div v-for="(error, index) in errores" :key="index">
+          <Alerta>{{ error[0] }}</Alerta>
+        </div>
+      </div>
       <div class="mb-4">
         <label for="email" class="block text-sm font-medium text-gray-700"
           >Email</label
