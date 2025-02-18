@@ -83,8 +83,7 @@ export const useAuthStore = defineStore("auth", () => {
       }, 3000);
     } catch (error) {
       console.log("Error en reset", error);
-
-      //errores.value = Object.values(error.response.data.errors);
+      errores.value = Object.values(error.response.data.errors);
     }
   };
 
