@@ -6,6 +6,7 @@ import { useRouter, useRoute } from "vue-router";
 export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
   const user = ref(null);
+  const errores = ref([]);
 
   onMounted(async () => {
     await getUser();
@@ -21,7 +22,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
-  const login = async (datos, errores) => {
+  const login = async (datos) => {
     try {
       await apiAuth.csrf();
       await apiAuth.login(datos);
@@ -30,18 +31,22 @@ export const useAuthStore = defineStore("auth", () => {
       router.push({ name: "home" });
     } catch (error) {
       console.log(error.response.data.errors);
-      errores.value = Object.values(error.response.data.errors);
+      console.log(Object.values(error.response.data.errors))
+      errores.value = error.response.data.errors
     }
   };
 
-  const registro = async (datos, errores) => {
+  const registro = async (datos) => {
     try {
+      errores.value = [];
       const response = await apiAuth.register(datos);
-      console.log(response);
+      console.log("Registro", response);
+      
       await getUser();
       await router.push({ name: "home" });
     } catch (error) {
-      console.log("Error en el registro", error);
+      console.log(error.response.data.errors);
+      errores.value = Object.values(error.response.data.errors);
     }
   };
 
@@ -53,12 +58,37 @@ export const useAuthStore = defineStore("auth", () => {
     } catch (error) {}
   };
 
+  const forgot_password = async (email) => {
+    try {
+      await apiAuth.csrf();
+      const response = await apiAuth.forgotPassword({email: email.value});
+      errores.value = [];
+    } catch (error) {
+      console.log(error);
+      errores.value = Object.values(error.response.data.errors);
+    }
+  };
+
+  const reset_password = async (datos) => {
+    errores.value = []
+    try {
+      const response = await apiAuth.resetPassword(datos);
+      console.log(response);
+      await router.push({name: 'home'})
+    } catch (error) {
+      errores.value = Object.values(error.response.data.errors);
+    }
+  }
+
   const isAuthenticated = computed(() => !!user.value);
 
   return {
     login,
     registro,
     logout,
+    forgot_password,
+    reset_password,
+    errores,
     user,
     getUser,
     isAuthenticated,

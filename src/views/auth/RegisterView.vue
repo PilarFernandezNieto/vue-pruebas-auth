@@ -12,10 +12,10 @@ const datos = reactive({
   password: "",
   password_confirmation: "",
 });
-const errores = ref([]);
+
 
 const handleRegister = async () => {
-  await authStore.registro(datos, errores);
+  await authStore.registro(datos);
 };
 </script>
 
@@ -24,9 +24,9 @@ const handleRegister = async () => {
     <h1 class="text-center uppercase text-sm font-medium mb-4">
       Formulario de Registro
     </h1>
-    <form @submit.prevent="handleRegister" class="p-4">
-      <!-- <div v-if="errores" class="my-4">
-          <div v-for="(error, index) in errores" :key="index">
+    <form @submit.prevent="handleRegister" class="p-4" novalidate>
+      <div v-if="authStore.errores" >
+          <div v-for="(error, index) in authStore.errores" :key="index" class="my-4">
             <Alerta v-if="error.length < 2"> {{ error[0] }}</Alerta>
             <div v-if="error.length >= 2">
               <Alerta v-for="(errorPassword, index) in error" :key="index">{{
@@ -34,7 +34,7 @@ const handleRegister = async () => {
               }}</Alerta>
             </div>
           </div>
-        </div> -->
+        </div>
       <div class="mb-4">
         <label for="name" class="block text-sm font-medium text-gray-700"
           >Nombre</label

@@ -7,14 +7,14 @@ import Alerta from "@/components/Alerta.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
-const errores = ref([]);
+
 const datos = reactive({
   email: "",
   password: "",
 });
 
 const handleLogin = async () => {
-  await authStore.login(datos, errores);
+  await authStore.login(datos);
 };
 </script>
 <template>
@@ -23,8 +23,8 @@ const handleLogin = async () => {
       Inicia sesión
     </h1>
     <form @submit.prevent="handleLogin" class="p-4">
-      <div v-if="errores" class="my-4">
-        <div v-for="(error, index) in errores" :key="index">
+      <div v-if="authStore.errores" >
+        <div v-for="(error, index) in authStore.errores" :key="index" class="my-4">
           <Alerta>{{ error[0] }}</Alerta>
         </div>
       </div>
@@ -57,11 +57,16 @@ const handleLogin = async () => {
         class="bg-indigo-600 hover:bg-indigo-800 transition duration-600 ease-in-out text-white p-2 w-full rounded-md cursor-pointer"
       />
     </form>
-    <div class="flex justify-center">
+    <div class="flex items-center flex-col space-y-1 justify-center">
       <RouterLink
         :to="{ name: 'register' }"
-        class="text-sm text-indigo-600 hover:text-indigo-800"
+        class="text-xs text-indigo-600 hover:text-indigo-800"
         >¿Aún no tienes cuenta? Regístrate aquí</RouterLink
+      >
+      <RouterLink
+        :to="{ name: 'forgot-password' }"
+        class="text-xs text-indigo-600 hover:text-indigo-800"
+        >¿Has olvidado la contraseña? Pincha aquí</RouterLink
       >
     </div>
   </div>
