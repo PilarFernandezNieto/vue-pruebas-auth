@@ -8,7 +8,7 @@ export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
   const user = ref(null);
   const errores = ref([]);
-  const mensaje = ref("");
+  const status = ref("");
   const toast = useToastStore();
 
   onMounted(async () => {
@@ -65,7 +65,7 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       await apiAuth.csrf();
       const { data } = await apiAuth.forgotPassword({ email: email.value });
-      mensaje.value = data.status;
+      status.value = data.status;
       errores.value = [];
     } catch (error) {
       console.log(error);
@@ -78,10 +78,12 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const { data } = await apiAuth.resetPassword(datos);
       toast.mostrarExito(data.status);
-      await router.push({ name: "login" });
+      setTimeout(() => {
+        router.push({ name: "login" });
+      }, 3000);
     } catch (error) {
       console.log("Error en reset", error);
-      
+
       //errores.value = Object.values(error.response.data.errors);
     }
   };
@@ -95,7 +97,7 @@ export const useAuthStore = defineStore("auth", () => {
     forgot_password,
     reset_password,
     errores,
-    mensaje,
+    status,
     user,
     getUser,
     isAuthenticated,
