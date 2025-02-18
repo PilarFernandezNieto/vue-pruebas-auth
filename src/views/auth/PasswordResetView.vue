@@ -2,6 +2,7 @@
 import { reactive } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
+import Alerta from "@/components/Alerta.vue";
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -23,6 +24,15 @@ const handleResetPassword = async () => {
       Resetea contraseña
     </h1>
     <form @submit.prevent="handleResetPassword" class="p-4">
+      <div v-if="authStore.errores">
+        <div
+          v-for="(error, index) in authStore.errores"
+          :key="index"
+          class="my-4"
+        >
+          <Alerta>{{ error[0] }}</Alerta>
+        </div>
+      </div>
       <div class="mt-4">
         <label for="password" class="block text-sm font-medium text-gray-700"
           >Password</label
