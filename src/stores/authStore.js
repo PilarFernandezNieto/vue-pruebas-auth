@@ -12,7 +12,7 @@ export const useAuthStore = defineStore("auth", () => {
   const toast = useToastStore();
 
   onMounted(async () => {
-    await getUser();
+    //await getUser();
   });
 
   const getUser = async () => {
@@ -21,7 +21,8 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = data;
     } catch (error) {
       user.value = null;
-      console.log("Error de user", error);
+      toast.mostrarError(error.response.data.message)
+      console.log("Error de user", error.response.data.message);
     }
   };
 
@@ -29,7 +30,12 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       await apiAuth.csrf();
       await apiAuth.login(datos);
-      await getUser();
+      if (isEmailVerified) {
+        await getUser();
+      } else {
+        router.push({ name: "verify-email" });
+      }
+
       errores.value = [];
       router.push({ name: "home" });
     } catch (error) {
@@ -39,19 +45,34 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const isEmailVerified = computed(() => user?.value.email_verified_at);
+
   const registro = async (datos) => {
     try {
+      await apiAuth.csrf();
       errores.value = [];
       const response = await apiAuth.register(datos);
       console.log("Registro", response);
-
-      await getUser();
-      await router.push({ name: "home" });
+      //await getUser();
+      router.push({ name: "verify-email-notice" });
     } catch (error) {
-      console.log(error.response.data.errors);
+      console.log("Error en registro", error);
       errores.value = Object.values(error.response.data.errors);
     }
   };
+
+  const verifyEmail = async (id, hash) => {
+    console.log("id", id);
+    console.log("hash", hash);
+    
+    try {
+      const response = await apiAuth.verifyEmail(id, hash)
+      console.log(response);
+    } catch (error) {
+      console.log("Error verify email", error);
+      
+    }
+  }
 
   const logout = async () => {
     try {
@@ -92,6 +113,7 @@ export const useAuthStore = defineStore("auth", () => {
   return {
     login,
     registro,
+    verifyEmail,
     logout,
     forgot_password,
     reset_password,

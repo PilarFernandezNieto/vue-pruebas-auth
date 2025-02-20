@@ -36,10 +36,11 @@ const router = createRouter({
           component: () => import("@/views/auth/PasswordResetView.vue")
         },
         {
-          path: "verify-email",
-          name: "verify-email",
+          path: "verify-email-notice",
+          name: "verify-email-notice",
           component: () => import("@/views/auth/VerifyEmailView.vue")
-        }
+        },
+   
       ]
     }
 

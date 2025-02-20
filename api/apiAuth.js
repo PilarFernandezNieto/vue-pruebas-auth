@@ -10,6 +10,10 @@ export default {
   register(data) {
     return clienteAxios.post("/register", data);
   },
+
+  verifyEmail(id, hash){
+    return clienteAxios.get(`/verify-email/${id}/${hash}`);
+  },
   logout() {
     return clienteAxios.post("/logout");
   },
