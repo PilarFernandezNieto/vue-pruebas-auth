@@ -14,6 +14,9 @@ export default {
   verifyEmail(id, hash){
     return clienteAxios.get(`/verify-email/${id}/${hash}`);
   },
+  emailVerification(){
+    return clienteAxios.post('/email/verification-notification');
+  },
   logout() {
     return clienteAxios.post("/logout");
   },

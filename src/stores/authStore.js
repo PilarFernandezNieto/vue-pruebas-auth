@@ -3,6 +3,7 @@ import { ref, reactive, onMounted, computed } from "vue";
 import apiAuth from "../../api/apiAuth";
 import { useRouter, useRoute } from "vue-router";
 import { useToastStore } from "./toastStore";
+import clienteAxios from "../../config/axios";
 
 export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
@@ -11,18 +12,19 @@ export const useAuthStore = defineStore("auth", () => {
   const status = ref("");
   const toast = useToastStore();
 
-  onMounted(async () => {
-    //await getUser();
-  });
+  onMounted(async () => {});
 
   const getUser = async () => {
     try {
       const { data } = await apiAuth.authUser();
-      user.value = data;
+      return data;
     } catch (error) {
-      user.value = null;
-      toast.mostrarError(error.response.data.message)
-      console.log("Error de user", error.response.data.message);
+      if (error.response.status == 409) {
+        await apiAuth.emailVerification();
+        router.push({ name: "verify-email-notice" });
+      } else {
+        console.log("Error de user", error.response.data.message);
+      }
     }
   };
 
@@ -30,21 +32,16 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       await apiAuth.csrf();
       await apiAuth.login(datos);
-      if (isEmailVerified) {
-        await getUser();
-      } else {
-        router.push({ name: "verify-email" });
+      user.value = await getUser();
+      if (user.value) {
+        router.push({ name: "home" });
       }
-
       errores.value = [];
-      router.push({ name: "home" });
+      
     } catch (error) {
-      console.log(error.response.data.errors);
-      console.log(Object.values(error.response.data.errors));
-      errores.value = error.response.data.errors;
-    }
+      errores.value = Object.values(error?.response?.data?.errors);
   };
-
+}
   const isEmailVerified = computed(() => user?.value.email_verified_at);
 
   const registro = async (datos) => {
@@ -53,7 +50,6 @@ export const useAuthStore = defineStore("auth", () => {
       errores.value = [];
       const response = await apiAuth.register(datos);
       console.log("Registro", response);
-      //await getUser();
       router.push({ name: "verify-email-notice" });
     } catch (error) {
       console.log("Error en registro", error);
@@ -64,15 +60,14 @@ export const useAuthStore = defineStore("auth", () => {
   const verifyEmail = async (id, hash) => {
     console.log("id", id);
     console.log("hash", hash);
-    
+
     try {
-      const response = await apiAuth.verifyEmail(id, hash)
+      const response = await apiAuth.verifyEmail(id, hash);
       console.log(response);
     } catch (error) {
       console.log("Error verify email", error);
-      
     }
-  }
+  };
 
   const logout = async () => {
     try {

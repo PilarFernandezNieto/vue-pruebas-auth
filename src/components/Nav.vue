@@ -5,6 +5,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 const authStore = useAuthStore();
 
+
 onMounted(() => {
   $("#menu-toggle").click(() => {
     $("#mobile-menu").toggle();
@@ -47,7 +48,7 @@ onMounted(() => {
     <!-- Menú desplegable en dispositivos móviles -->
     <div id="mobile-menu" class="lg:hidden hidden bg-white shadow-md">
       <nav class="flex flex-col space-y-4 p-4">
-        <RouterLink
+        <RouterLink v-if="!authStore.user"
           :to="{ name: 'login' }"
           class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded w-24 text-center"
           >Inicia sesión</RouterLink
@@ -59,7 +60,7 @@ onMounted(() => {
         >
           Cierra sesión
         </button>
-        <RouterLink
+        <RouterLink v-if="!authStore.user"
           :to="{ name: 'register' }"
           class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded w-24 text-center"
           >Registro</RouterLink
