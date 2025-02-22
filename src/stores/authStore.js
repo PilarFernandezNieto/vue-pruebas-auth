@@ -11,37 +11,42 @@ export const useAuthStore = defineStore("auth", () => {
   const errores = ref([]);
   const status = ref("");
   const toast = useToastStore();
+  const token = ref(localStorage.getItem("AUTH_TOKEN") || null);
 
-  onMounted(async () => {});
+  onMounted(async () => {
+    if (user.value !== null) {
+      await auth();
+    }
+  });
 
-  const getUser = async () => {
+  const auth = async () => {
     try {
       const { data } = await apiAuth.authUser();
-      return data;
+      user.value = data;
+      console.log("desde auth", user.value);
     } catch (error) {
       if (error.response.status == 409) {
         await apiAuth.emailVerification();
         router.push({ name: "verify-email-notice" });
-      } else {
-        console.log("Error de user", error.response.data.message);
-      }
+      } 
+      throw new Error("Unable to fetch user data");
     }
   };
+
+  const isAuthenticated = computed(() => user.value !== null);
 
   const login = async (datos) => {
     try {
       await apiAuth.csrf();
       await apiAuth.login(datos);
-      user.value = await getUser();
-      if (user.value) {
-        router.push({ name: "home" });
-      }
+      await auth();
       errores.value = [];
-      
+      console.log("En login", user.value);
+      router.push({ name: "home" });
     } catch (error) {
       errores.value = Object.values(error?.response?.data?.errors);
+    }
   };
-}
   const isEmailVerified = computed(() => user?.value.email_verified_at);
 
   const registro = async (datos) => {
@@ -68,13 +73,15 @@ export const useAuthStore = defineStore("auth", () => {
       console.log("Error verify email", error);
     }
   };
-
   const logout = async () => {
     try {
       await apiAuth.logout();
+    } catch (error) {
+      console.error("Error en logout", error);
+    } finally {
       user.value = null;
-      await router.push({ name: "login" });
-    } catch (error) {}
+      router.push({ name: "login" });
+    }
   };
 
   const forgot_password = async (email) => {
@@ -103,9 +110,9 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
-  const isAuthenticated = computed(() => !!user.value);
-
   return {
+    auth,
+    token,
     login,
     registro,
     verifyEmail,
@@ -115,7 +122,6 @@ export const useAuthStore = defineStore("auth", () => {
     errores,
     status,
     user,
-    getUser,
     isAuthenticated,
   };
 });

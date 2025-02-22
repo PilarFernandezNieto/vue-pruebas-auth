@@ -5,6 +5,7 @@ export default {
     return clienteAxios.get("/sanctum/csrf-cookie");
   },
   login(data) {
+    
     return clienteAxios.post("/login", data);
   },
   register(data) {
@@ -28,6 +29,6 @@ export default {
   },
 
   authUser() {
-    return clienteAxios.get("/api/user");
+    return clienteAxios.get("/api/user")
   },
 };

@@ -26,6 +26,16 @@ onMounted(() => {
           </button>
         </div>
         <div class="hidden lg:flex space-x-4 items-center">
+          <RouterLink 
+            :to="{ name: 'hola' }"
+            class="text-sm text-medium text-indigo-600 hover:text-indigo-800  text-center"
+            >Hola</RouterLink
+          >
+          <RouterLink 
+            :to="{ name: 'admin' }"
+            class="text-sm text-medium text-indigo-600 hover:text-indigo-800  text-center"
+            >Admin</RouterLink
+          >
           <RouterLink v-if="!authStore.user"
             :to="{ name: 'login' }"
             class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded text-center"
@@ -47,22 +57,32 @@ onMounted(() => {
     </div>
     <!-- Menú desplegable en dispositivos móviles -->
     <div id="mobile-menu" class="lg:hidden hidden bg-white shadow-md">
-      <nav class="flex flex-col space-y-4 p-4">
+      <nav class="flex flex-col items-start space-y-4 p-4">
+        <RouterLink 
+            :to="{ name: 'hola' }"
+            class="text-sm text-medium text-indigo-600 hover:text-indigo-800"
+            >Hola</RouterLink
+          >
+          <RouterLink 
+            :to="{ name: 'admin' }"
+            class="text-sm text-medium text-indigo-600 hover:text-indigo-800"
+            >Admin</RouterLink
+          >
         <RouterLink v-if="!authStore.user"
           :to="{ name: 'login' }"
-          class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded w-24 text-center"
+          class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded"
           >Inicia sesión</RouterLink
         >
         <button
           v-if="authStore.user"
           @click="authStore.logout"
-          class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded w-24 text-center"
+          class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded"
         >
           Cierra sesión
         </button>
         <RouterLink v-if="!authStore.user"
           :to="{ name: 'register' }"
-          class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded w-24 text-center"
+          class="text-sm text-medium text-indigo-600 hover:text-indigo-800 border border-indigo-600 p-2 rounded text-center"
           >Registro</RouterLink
         >
       </nav>
